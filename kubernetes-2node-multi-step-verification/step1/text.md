@@ -1,5 +1,3 @@
-Everything can also be found on: https://falco.org/docs
-
 # Zestawienie środowiska
 
 ## Deploy falco na naszym klastrze
@@ -18,7 +16,13 @@ helm install --replace falco --namespace falco --create-namespace --set tty=true
 ### Sprawdzamy stan deploymentu
 ```
 kubectl get pods -n falco
-kubectl wait pods --for=condition=Ready --all -n falco
 ```{{exec}}
 
-Jak wszystko działa można przejść do kolejnego kroku
+Dopiero kiedy po uruchomieniu powyższej komendy będziemy mieć status:
+```
+NAME          READY   STATUS     RESTARTS   AGE
+falco-q7flx   0/2     Init:0/2   0          9s
+falco-xp27h   0/2     Init:0/2   0          9s
+```
+
+Można przejść dalej.

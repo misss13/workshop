@@ -1,28 +1,13 @@
 # Przetestowanie domyślnych reguł
 
 ## Wprowadzenie
-W systemach (wykorzystujących kernel Linux) np.: Ubuntu, plik `/etc/shadow` modyfikowany jest przy tworzeniu nowego użytkownika lub zmianie jego hasła. Nie jest normalnym działaniem odczyt zawartości tego pliku.
+W systemach wykorzystujących kernel Linux, plik `/etc/shadow` modyfikowany jest przy tworzeniu nowego użytkownika lub zmianie jego hasła. Nie jest normalnym działaniem odczyt zawartości tego pliku.
 
-*Hash haseł* - w systemie nie przetrzymuje się haseł jako jawnych ciągów znaków tylko jako hash. 
-
-Dla hasła:
-
-`superT4jneH#asl0^`
- 
-w systemie ubuntu to będzie hash:
-  
-`$y$j9T$XC0SsZ0WO0hZrPeb9C6rG0$sVKgSw3FtEH9hEeM4NBOZcx6c6GE2/hAWF37ammyIkC`
-  
-taki hash znajduje się właśnie w pliku `/etc/shadow`.
-
+Jednym z zadań SOCu w organizacji jest monitorowanie takich niecodziennych działań i sprawdzanie czy zostały one przeprowadzone w ramach zatwierdzonych zadań (tasków) i zostały potwierdzone. SOC musi wiedzieć czy takie zadanie było przeprowadzone w organizacji celowo, czy nie; w drugim przypadku może być to IoC.
 <br>
 
-<details><summary>Większy opis czemu jest to istotne</summary>
-Takie operacje w organizacjach muszą być odnotowane w systemie ticketowania (śledzenia zadań które pracownicy robią, wraz z potwierdzeniami od ich przełożonych np.: Jira). 
-
-Nikt normalnie nie powinien wchodzić ręcznie do działających podów, oczywiście z uwagi na jakiś problem może się to zdażyć.
-
-Jednym z zadań SOCu w organizacji jest monitorowanie takich niecodziennych działań i sprawdzanie czy zostały one przeprowadzone w ramach zatwierdzonych zadań (tasków) i zostały potwierdzone przez kogoś. SOC musi wiedzieć czy takie zadanie było przeprowadzone w organizacji celowo, czy nie; w drugim przypadku może być to IoC.
+<details><summary>Rozszerzony opis</summary>
+Takie operacje w organizacjach muszą być odnotowane w systemie ticketowania (śledzenia zadań które pracownicy robią, wraz z potwierdzeniami od ich przełożonych np.: Jira). Nikt normalnie nie powinien wypisywać zawartości pliku `/etc/shadow`, oczywiście z uwagi na naprawianie jakiegoś problemu może się to wydarzyć, wymaga to jednak wyjaśnienia.
 
 #### Można zapytać dlaczego niby jest to podejrzane?
 A po co ktoś miałby czytać plik zawierający hashe haseł wszystkich użytkowników systemowych. Skrypty do wyciągania informacji z serwera, chętnie biorą te dane, do ransomwaru, późniejszej analizy lub odsprzedania. MITRE dla tej operacji definiuje techinikę [T1555](https://attack.mitre.org/techniques/T1555/).

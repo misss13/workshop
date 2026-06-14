@@ -1,3 +1,3 @@
 #!/bin/bash
 
-kubectl get pods -n falco -l app.kubernetes.io/name=falco --field-selector=status.phase=Stopped
+test "$(kubectl get pods -n falco --no-headers | grep Running | wc -l)" -eq 2
