@@ -1,4 +1,4 @@
 
 <br>
 
-### Let's learn some Kubernetes
+### Warsztaty Blue Team

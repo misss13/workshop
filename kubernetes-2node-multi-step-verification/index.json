@@ -1,18 +1,18 @@
 {
-  "title": "Kubernetes 2node multi-step verification",
-  "description": "Uses a two node Kubernetes cluster and performs user input verification in all steps",
+  "title": "Warsztaty Blue Team",
+  "description": "Dwa nody kubenretes, będą wykorzystane do wprowadzenie prostego monitoringu przy użyciu narzędzia falco.",
   "details": {
     "intro": {
       "text": "intro.md"
     },
     "steps": [
       {
-        "title": "Create a pod",
+        "title": "Instalacja falco",
         "text": "step1/text.md",
         "verify": "step1/verify.sh"
       },
       {
-        "title": "Delete a pod",
+        "title": "Testowanie default reguły",
         "text": "step2/text.md",
         "verify": "step2/verify.sh"
       }

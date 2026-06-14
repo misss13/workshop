@@ -1,6 +1,6 @@
 
 <br>
 
-### WELL DONE !
+### Gratulacje zestawiłeś własne środowisko do monitorowania!
 
-You solved this challenge!
+I udało Ci się rozwiązać wszystkie zadania 🥳.
