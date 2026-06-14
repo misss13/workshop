@@ -7,7 +7,7 @@
     },
     "steps": [
       {
-        "title": "Instalacja falco",
+        "title": "Instalacja Falco",
         "text": "step1/text.md",
         "verify": "step1/verify.sh"
       },

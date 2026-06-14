@@ -18,11 +18,14 @@ helm install --replace falco --namespace falco --create-namespace --set tty=true
 kubectl get pods -n falco
 ```{{exec}}
 
-Dopiero kiedy po uruchomieniu powyższej komendy będziemy mieć status:
+Trzeba poczekać około minutę. Dopiero kiedy po uruchomieniu powyższej komendy będziemy mieć status *Running*, można przejść dalej (status sprawdzamy powyższą komendą):
 ```
 NAME          READY   STATUS     RESTARTS   AGE
-falco-q7flx   0/2     Init:0/2   0          9s
-falco-xp27h   0/2     Init:0/2   0          9s
+falco-q7flx   0/2     Running   0          9s
+falco-xp27h   0/2     Running   0          9s
 ```
 
-Można przejść dalej.
+### Na co czekamy?
+Powyższe komendy uruchamiają na każdym nodzie(maszynie wirtualnej), po jednym podzie(kontenerze) falco, ten pod(kontener) będzie monitorował co aktualnie dzieje się na systemie oraz w kontenerach.
+
+Może to zająć trochę czasu, bo pobiera się na każdy node obraz falco, żeby sprawdzić status wystarczy wykonać powyższą komendę `kubectl get pods -n falco`.
