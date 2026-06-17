@@ -5,7 +5,7 @@
 Przejdziemy przez kawałek zadań z dokumentacji https://falco.org/docs
 Infrastruktura, której będziemy używać:
 
-![infra](https://i.imgur.com/2qUEBNw.png)
+![infra](https://i.imgur.com/DTQhAmi.png)
 
 W tych warsztatach przeprowadzimy:
 - instalację narzędzia Falco
