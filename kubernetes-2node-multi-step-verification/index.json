@@ -15,6 +15,21 @@
         "title": "Testowanie domyślnej reguły",
         "text": "step2/text.md",
         "verify": "step2/verify.sh"
+      },
+      {
+        "title": "Zestawienie falcosidekick",
+        "text": "step3/text.md",
+        "verify": "step3/verify.sh"
+      },
+      {
+        "title": "Dodanie nowej reguły",
+        "text": "step4/text.md",
+        "verify": "step4/verify.sh"
+      },
+      {
+        "title": "Operacje na n8n",
+        "text": "step5/text.md",
+        "verify": "step5/verify.sh"
       }
     ],
     "finish": {

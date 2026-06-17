@@ -5,9 +5,11 @@
 Przejdziemy przez kawałek zadań z dokumentacji https://falco.org/docs
 Infrastruktura, której będziemy używać:
 
+![infra](https://i.imgur.com/nxqsOw7.png)
+
 W tych warsztatach przeprowadzimy:
 - instalację narzędzia Falco
 - przetestujemy domyślną regułę jaką narzędzie dostarcza
-- napiszemy własne reguły
+- napiszemy własną regułe
 - zestawimy przesyłanie alertów do narzędzia N8N
 - napiszemy playbook do obsługi takich alertów przez L1
