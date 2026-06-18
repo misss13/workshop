@@ -21,8 +21,8 @@ kubectl get pods -n falco
 Trzeba poczekać około minutę. Dopiero kiedy po uruchomieniu powyższej komendy będziemy mieć status *Running*, można przejść dalej (status sprawdzamy powyższą komendą):
 ```
 NAME          READY   STATUS     RESTARTS   AGE
-falco-q7flx   0/2     Running   0          9s
-falco-xp27h   0/2     Running   0          9s
+falco-q7flx   2/2     Running   0          9s
+falco-xp27h   2/2     Running   0          9s
 ```
 
 ### Na co czekamy?
