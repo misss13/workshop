@@ -108,3 +108,22 @@ Po zapisaniu pliky `values.yaml` przechodzimy do zakładki `Tab1` i wykonujemy k
 ```
 helm upgrade falco falcosecurity/falco -n falco -f values.yaml
 ```{{exec}}
+
+
+### Przetestowanie reguł dla zespołu *soc-project-team*
+
+```
+cat /etc/shadow
+```{{exec}}
+
+Powinno przyjść powiadomienie na odpowiedni kanał.
+
+
+### Przetestowanie reguł dla zespołu *app-team*
+
+```
+kubectl exec -it $(kubectl get pods --selector=app=nginx -o name) -- /bin/bash
+```{{exec}}
+
+a później `exit`
+Powinno przyjść powiadomienie na odpowiedni kanał.

@@ -1,1 +1,2 @@
 # Dodanie nowej reguły
+

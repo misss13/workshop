@@ -144,6 +144,10 @@ kubectl logs -l app.kubernetes.io/name=falco -n falco -c falco | grep Warning | 
 ```{{exec}}
 
 ### Na nodzie
+```
+cat /etc/shadow
+```{{exec}}
+
 Warto zauważyć że kiedy wpisujemy komendę `id` otrzymujemy:
 ```
 root@controlplane:~$ id
