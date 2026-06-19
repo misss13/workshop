@@ -10,6 +10,6 @@ Infrastruktura, której będziemy używać:
 W tych warsztatach przeprowadzimy:
 - instalację narzędzia Falco
 - przetestujemy domyślną regułę jaką narzędzie dostarcza
-- napiszemy własną regułe
 - zestawimy przesyłanie alertów do narzędzia N8N
+- napiszemy własną regułe
 - napiszemy playbook do obsługi takich alertów przez L1

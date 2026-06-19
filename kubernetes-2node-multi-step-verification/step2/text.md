@@ -1,7 +1,7 @@
 # Przetestowanie domyślnych reguł
 
 ## Wprowadzenie
-W systemach wykorzystujących kernel Linux, plik `/etc/shadow` modyfikowany jest przy tworzeniu nowego użytkownika lub zmianie jego hasła. Nie jest normalnym działaniem odczyt zawartości tego pliku.
+W systemach wykorzystujących kernel Linux, plik `/etc/shadow` modyfikowany jest przy tworzeniu nowego użytkownika lub zmianie jego hasła. Nie jest normalnym działaniem odczyt zawartości tego pliku przez użytkownika. Oczywiście, programy do sprawdzania poprawności hasła mają nie generować dla odczytu tego pliku eventu.
 
 Jednym z zadań SOCu w organizacji jest monitorowanie takich niecodziennych działań i sprawdzanie czy zostały one przeprowadzone w ramach zatwierdzonych zadań (tasków). SOC musi wiedzieć czy takie zadanie było przeprowadzone w organizacji celowo, czy nie; w drugim przypadku może być to IoC.
 <br>
@@ -58,8 +58,9 @@ Przy uruchomieniu falco bez wskazania mu pliku z regułami zostanie użyty [domy
 ```
 
 ### Poniżej spisano makra oraz listy wykorzystane w powyższej regule
-Makro zastępuje długi ciąg lub zbiór warunków, celem łatwiejszego czytania reguł. 
-Lista zawiera w sobie zmienne np.: nazwy plików, programów, nazw folderów, adresów IP.
+*Makro* zastępuje długi ciąg lub zbiór warunków, celem łatwiejszego czytania reguł. 
+
+*Lista* zawiera w sobie zmienne np.: nazwy plików, programów, nazw folderów, adresów IP.
 
 
 Makro **open_read** prosi żeby falco monitorowało system calle  wykorzystywane do odczytu pliku. Oczywiście monitorowanie wszystkich odczytów plików nie miałoby sensu - byłoby ich zbyt dużo.
@@ -68,18 +69,18 @@ Makro **open_read** prosi żeby falco monitorowało system calle  wykorzystywane
   condition: (evt.type in (open,openat,openat2) and evt.is_open_read=true and fd.typechar='f' and fd.num>=0)
 ```
 
-Makro **sensitive_files** plików które zostały oznaczone jako wrażliwe pliki. W tym makro zostało zrobione odwołanie do listy *sensitive_file_names* zawierającej plik `/etc/shadow`, którego odczyt będziemy testować.
+Lista **sensitive_file_names** zawieraja absolutne ścieżki wrażliwych plików.
+```
+- list: sensitive_file_names
+  items: [/etc/shadow, /etc/sudoers, /etc/pam.conf, /etc/security/pwquality.conf]
+```
+
+Makro **sensitive_files** sprawdza absolutną ścieżkę pliku, czy znajduje się ona w liście plików oznaczonych jako wrażliwe *sensitive_file_names*. Widać, że jednym z wrażliwych plików w tej liście jest `/etc/shadow`. Właśnie ten odczyt będziemy testować.
 ```
 - macro: sensitive_files
   condition: >
     (fd.name in (sensitive_file_names) or
       fd.directory in (/etc/sudoers.d, /etc/pam.d))
-```
-
-Lista **sensitive_file_names** zawieraja nazwy wrażliwych plików.
-```
-- list: sensitive_file_names
-  items: [/etc/shadow, /etc/sudoers, /etc/pam.conf, /etc/security/pwquality.conf]
 ```
 
 Makro **proc_name_exists** wymaga, żeby proces posiadał nazwę.
@@ -103,19 +104,24 @@ Dla uproszczenia:
 
     and not [...] #inne wyjątki
 
-  output: Sensitive file opened for reading by non-trusted program | file=%fd.name gparent=%proc.aname[2] ggparent=%proc.aname[3] gggparent=%proc.aname[4] evt_type=%evt.type user=%user.name user_uid=%user.uid user_loginuid=%user.loginuid process=%proc.name proc_exepath=%proc.exepath parent=%proc.pname command=%proc.cmdline terminal=%proc.tty
+  output: Sensitive file opened for ... #treść wygenerowanego eventu
 
-  priority: WARNING
+  priority: WARNING #priorytet
 
-  tags: [maturity_stable, host, container, filesystem, mitre_credential_access, T1555]
+  tags: [T1555, ...] #techniki jakie łączą się z tym eventem, np z macierzy MITRE lub tagi czego dotyczy event
 ```
+
+### Inne wyjątki
+Warto pamiętać, że sam system robi odczyty tego pliku `/etc/shadow` jeśli potrzebuje przeprowadzić proces uwierzytelniania, np.: przy logowaniu. Przy tworzeniu/usuwaniu nowego użytkownika, zmianie hasła, użyciu samego `sudo`. Niezależnie od działania systemu, inne aplikacje również mogą polegać na systemowych użytkownikach i ich hasłach, na nie również trzeba wprowadzić wyjątki - ansible, vpn, mail, ssh. Wprowadzanie nowych narzędzi w trakcie trwania monitoringu, również może spowodować konieczność dodanie nowego wyjątku do tej reguły.
+
 Powyższa reguła może być znaleziona [tutaj](https://github.com/falcosecurity/rules/blob/b71a8c0df60b005dc3cd716ade0386d9c2324a1f/rules/falco_rules.yaml#L397).
 
+
 ## Wywołanie reguły
-W tym celu spróbujemy dwóch podejść: na nowo utworzonym podzie (kontenerze) oraz na aktualnym podzie (maszynie wirtualnej *controlplane*)
+W tym celu spróbujemy dwóch podejść: na nowo utworzonym **podzie** oraz na aktualnym **nodzie**.
 
 ### Na podzie
-Tworzymy na początek nowy pod z aplikacją ngnix
+Tworzymy na początek nowy pod z aplikacją ngnix:
 
 ```
 kubectl create deployment nginx --image=nginx
@@ -127,12 +133,12 @@ NAME                     READY   STATUS    RESTARTS   AGE
 nginx-56c45fd5ff-jm77z   1/1     Running   0          21s
 ```
 
-możemy to sprawdzić komendą
+Możemy to sprawdzić komendą:
 ```
 kubectl get pods
 ```{{exec}}
 
-a następnie uruchamiamy, polecenie którym uruchomimy komendę `cat /etc/shadow` już na nowo utworzonym podzie
+a następnie uruchamiamy polecenie na nowo utworzonym podzie `nginx`, którym wykonamy komendę `cat /etc/shadow` 
 ```
 kubectl exec -it $(kubectl get pods --selector=app=nginx -o name) -- cat /etc/shadow
 ```{{exec}}
@@ -140,7 +146,7 @@ kubectl exec -it $(kubectl get pods --selector=app=nginx -o name) -- cat /etc/sh
 #### Sprawdzenie 
 Poniższa komenda pozwoli na sprawdzenie czy faktycznie udało się nam złapać odczyt pliku `/etc/shadow`
 ```
-kubectl logs -l app.kubernetes.io/name=falco -n falco -c falco | grep Warning | grep ngnix
+kubectl logs -l app.kubernetes.io/name=falco -n falco -c falco | grep Warning | grep nginx
 ```{{exec}}
 
 ### Na nodzie
@@ -148,15 +154,8 @@ kubectl logs -l app.kubernetes.io/name=falco -n falco -c falco | grep Warning | 
 cat /etc/shadow
 ```{{exec}}
 
-Warto zauważyć że kiedy wpisujemy komendę `id` otrzymujemy:
 ```
-root@controlplane:~$ id
-uid=0(root) gid=0(root) groups=0(root)
-```
-po sprawdzeniu pliku `/etc/passwd`:
-```
-root@controlplane:~$ cat /etc/passwd | grep 0:0
-root:x:0:0:root:/root:/bin/bash
-kc-internal:x:0:0::/root:/bin/bash
-```
-oznacza to że tak naprawdę wykonujemy polecenia jako użytkownik `kc-internal` nie koniecznie root
+kubectl logs -l app.kubernetes.io/name=falco -n falco -c falco | grep Warning | grep host
+```{{exec}}
+
+Jeśli w obu przypadkach `grep` coś znalazł oznacza to, że monitoring działa poprawnie.
