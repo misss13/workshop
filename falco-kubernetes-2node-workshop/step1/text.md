@@ -26,6 +26,6 @@ falco-xp27h   2/2     Running   0          9s
 ```
 
 ### Na co czekamy?
-Powyższe komendy uruchamiają na każdym nodzie(maszynie wirtualnej), po jednym podzie(kontenerze) falco, ten pod(kontener) będzie monitorował co aktualnie dzieje się na systemie oraz w kontenerach.
+Powyższe komendy uruchamiają na każdym nodzie, po jednym podzie falco, ten pod będzie monitorował co aktualnie dzieje się na systemie oraz w kontenerach.
 
 Może to zająć trochę czasu, bo pobiera się na każdy node obraz falco, żeby sprawdzić status wystarczy wykonać powyższą komendę `kubectl get pods -n falco`.

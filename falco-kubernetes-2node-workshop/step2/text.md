@@ -1,7 +1,7 @@
 # Przetestowanie domyślnych reguł
 
 ## Wprowadzenie
-W systemach wykorzystujących kernel Linux, plik `/etc/shadow` modyfikowany jest przy tworzeniu nowego użytkownika lub zmianie jego hasła. Nie jest normalnym działaniem odczyt zawartości tego pliku przez użytkownika. Oczywiście, programy do sprawdzania poprawności hasła mają nie generować dla odczytu tego pliku eventu.
+W systemach wykorzystujących kernel Linux, plik `/etc/shadow` modyfikowany jest przy tworzeniu nowego użytkownika lub zmianie jego hasła. Nie jest normalnym działaniem odczyt zawartości tego pliku przez użytkownika.
 
 Jednym z zadań SOCu w organizacji jest monitorowanie takich niecodziennych działań i sprawdzanie czy zostały one przeprowadzone w ramach zatwierdzonych zadań (tasków). SOC musi wiedzieć czy takie zadanie było przeprowadzone w organizacji celowo, czy nie; w drugim przypadku może być to IoC.
 <br>
@@ -61,7 +61,6 @@ Przy uruchomieniu falco bez wskazania mu pliku z regułami zostanie użyty [domy
 *Makro* zastępuje długi ciąg lub zbiór warunków, celem łatwiejszego czytania reguł. 
 
 *Lista* zawiera w sobie zmienne np.: nazwy plików, programów, nazw folderów, adresów IP.
-
 
 Makro **open_read** prosi żeby falco monitorowało system calle  wykorzystywane do odczytu pliku. Oczywiście monitorowanie wszystkich odczytów plików nie miałoby sensu - byłoby ich zbyt dużo.
 ```

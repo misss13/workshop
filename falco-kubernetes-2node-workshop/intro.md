@@ -2,7 +2,8 @@
 <br>
 
 ### Warsztaty Blue Team
-Przejdziemy przez kawałek zadań z dokumentacji https://falco.org/docs
+Przejdziemy przez kawałek zadań z dokumentacji https://falco.org/docs.
+
 Infrastruktura, której będziemy używać:
 
 ![infra](https://i.imgur.com/DTQhAmi.png)

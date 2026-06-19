@@ -13,24 +13,24 @@ After gaining access, attackers can modify the authorized_keys file to maintain 
 ```
 
 Warunki wywołania nowej reguły:
-- ktoś musi otworzyć plik do pisania - `open_write`
-- oraz ((plik musi być w ścieżce która zawiera /.ssh/ i ścieżka absolutna musi pasować do regexu '/home/*/.ssh/*') lub nazwa ścieżki zaczyna się od /root/.ssh) - `and (user_ssh_directory or fd.name startswith /root/.ssh)`
-- oraz (ścieżka absolutna pliku kończy się na authorized_keys lub authorized_keys2) - `and (fd.name endswith authorized_keys or fd.name endswith authorized_keys2)`
-- oraz nazwa procesu, który zrobił modyfikację pliku musi istnieć - `and proc_name_exists`
+- ktoś musi otworzyć plik do pisania - `open_write`{{copy}}
+- oraz ((plik musi być w ścieżce która zawiera /.ssh/ i ścieżka absolutna musi pasować do regexu '/home/\*/.ssh/\*') lub nazwa ścieżki zaczyna się od /root/.ssh) - `and (user_ssh_directory or fd.name startswith /root/.ssh)`{{copy}}
+- oraz (ścieżka absolutna pliku kończy się na authorized_keys lub authorized_keys2) - `and (fd.name endswith authorized_keys or fd.name endswith authorized_keys2)`{{copy}}
+- oraz nazwa procesu, który zrobił modyfikację pliku musi istnieć - `and proc_name_exists`{{copy}}
 
 Finalnie chcemy dostać event o zawartości:
 ```
-Ssh keys added to authorized_keys fd.name=%fd.name evt_type=%evt.type user=%user.name user_uid=%user.uid user_loginuid=%user.loginuid proc.name=%proc.name proc.pname=%proc.pname gparent=%proc.aname[2] ggparent=%proc.aname[3] gggparent=%proc.aname[4] proc_exepath=%proc.exepath command=%proc.cmdline terminal=%proc.tty)
-```
+Ssh keys added to authorized_keys fd.name=%fd.name evt_type=%evt.type user=%user.name user_uid=%user.uid user_loginuid=%user.loginuid proc.name=%proc.name proc.pname=%proc.pname gparent=%proc.aname[2] ggparent=%proc.aname[3] gggparent=%proc.aname[4] proc_exepath=%proc.exepath command=%proc.cmdline terminal=%proc.tty
+```{{copy}}
 
-Priorytet tej reguły: `WARNING`
+Priorytet tej reguły: `WARNING`{{copy}}
 
 Tagi, które ta reguła posiada: `[host, container, file, FIM, MITRE_T1098.004_account_manipulation_SSH_keys, MITRE_T1552.004_unsecured_credentials_private_keys]`
 
 
 ## Poprawienie pliku values.yaml
 
-Proszę otworzyć zakładkę Editor i wprowadzić powyższe wymagania dla reguły, finalnie plik powinien mieć budowę (zmieniane i modyfikowane powinno być wszystko co jest poniżej linijki `  custom-rules.yaml: |-` i powyżej linijki `falcosidekick:`)
+Proszę otworzyć zakładkę Editor i wprowadzić powyższe wymagania dla reguły, finalnie plik powinien mieć budowę (zmieniane i modyfikowane powinno być wszystko co jest poniżej linijki `custom-rules.yaml:` i powyżej linijki `falcosidekick:`)
 
 ```
 tty: true
@@ -69,13 +69,14 @@ Następnie należy przeładować pody falco żeby, usunęły się stare i utworz
 Po zapisaniu pliku `values.yaml`, przechodzimy do zakładki `Tab1` i wykonujemy:
 
 ```
-kubectl rollout restart daemonset/falco -n falco
-``` {{exec}}
+helm upgrade falco falcosecurity/falco -n falco -f values.yaml
+```{{exec}}
 
-Czekamy aż nasze pody wystartują, możemy to sprawdzić komendą poniżej (oba pody falco muszą mieć status `Running` co zajmuje ~1min)
+Czekamy aż nasze pody wystartują, możemy to sprawdzić komendą poniżej (oba pody falco muszą mieć status `Running` co zajmuje ~2min)
+**ORAZ PATRZYMY CZY W KOLUMNIE AGE PODY DZIAŁAJĄ KILKA SEKUND** będzie to oznaczać że mamy już do czynienia z nowymi podami, dopiero jeśli tak będzie można przejść dalej.
 ```
 kubectl get pods -n falco
-``` {{exec}}
+```{{exec}}
 
 
 ## Testowanie nowej reguły.
@@ -84,7 +85,7 @@ Wystarczy, że dopiszemy nowy klucz `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICR2396
 
 ```
 echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICR2396foaF4XENyQveTWb2jqCermPbQTK7yUDaRiJUy" >> /root/.ssh/authorized_keys
-``` {{exec}}
+```{{exec}}
 
 Na discordzie kanał `soc-project-team` powinien przyjść alert. Jeśli się tak stanie będzie można przejść do kolejnego zadania.
 

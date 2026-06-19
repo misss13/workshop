@@ -48,17 +48,19 @@ Tags:
 {{ $json.body.tags }}
 ```
 
-Zamykamy opcje bloku Discord (x). Wybieramy nowo utworzony blok, zmieniamy jego nazwę na n8n-soc i duplikujemy go (`ctrl + d`), w polu `Credential for Discord Webhook` tworzymy nowe credentiale i wklejamy w nie adres webhooka `n8n-dev`, zapisujemy. Zmieniamy nazwę bloku na `n8n-dev`
+Zamykamy opcje bloku Discord (x). Wybieramy nowo utworzony blok, zmieniamy jego nazwę na n8n-soc i duplikujemy go (`ctrl + d`), klikamy dwukrotnie w nowy blok w celu edycji, w polu `Credential for Discord Webhook` tworzymy nowe credentiale i wklejamy w nie adres webhooka `n8n-dev`, zapisujemy. Zmieniamy nazwę bloku na `n8n-dev`
 
 
-Dodajemy nowy blok `If`, podłączamy `true` do `n8n-dev`, a `false` do `n8n-soc` w conditions wklejamy:
+Dodajemy nowy blok `If`, podłączamy `true` do `n8n-dev`, a `false` do `n8n-soc` w conditions ustawiamy:
 ```
 {{ $json.body.rule }} is equal to
 Terminal shell in container
 ```
 
-Dodajemy kolejny blok `Webhook`, ustawiamy w nim `HTTP Method` nad `POST`, **kopiujemy Webhook TEST URL**. Na koniec łączymy blok `Webhook` z `If` i jak przedstawia obrazek niżej, całą resztę bloków która utworzyła się po drodzę i ich połączenia można usunąć:
+Dodajemy kolejny blok `Webhook`, ustawiamy w nim `HTTP Method` nad `POST`, **kopiujemy Webhook Production URL**. Łączymy blok `Webhook` z `If` i jak przedstawia obrazek niżej, całą resztę bloków która utworzyła się po drodzę i ich połączenia można usunąć:
 ![n8n-obrazek](https://i.imgur.com/R6z1ej9.png)
+
+Na koniec przechodzimy z zakładki **Editor** do zakładki **Executions**, znajduje się ona na środku w górnej części okna i wybieramy **Publish**, znajduje się w lewej górnej części ekranu. 
 
 W tym przypadku n8n będzie pełniło nam rolę *SOAR*. **NIE ZALECAM UŻYWANIA TEJ APLIKACJI DO PRZESYŁANIA WAŻNYCH DANYCH/DOSTĘPU DO PRYTWANYCH ŚRODOWISK** z uwagi na wcześniejsze krytyczne podatności [10.0 w skali CVSS](https://nvd.nist.gov/vuln/detail/CVE-2026-21858) jakie ta aplikacja sprezentowała. Niemniej jednak do zrozumienia przepływu danych jest ona idealna, należy pamiętać że każdy taki scenariusz można napisać samemu w dowolnym języku programowania.
 
@@ -68,7 +70,7 @@ Prezentowany tutaj przykład jest minimalistyczny, ale możnaby było wykorzysta
 
 **Falcosidekick** umożliwia przekazywanie eventów wygenerowanych przez falco do innych endpointów, umożliwia przeglądanie wygenerówanych eventów i nie tylko. W tych warsztatach posłuży nam jednak tylko do przekazywania logów dalej.
 
-W pliku `values.yaml` użyjemy wcześniej skopiowanego webhook URL z n8n (blok Webhook) ma on format: `http://3.91.220.165:5678/webhook-test/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`. 
+W pliku `values.yaml` użyjemy wcześniej skopiowanego webhook URL z n8n (blok Webhook) ma on format: `http://3.91.220.165:5678/webhook/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`. 
 
 Do stworzenia tego pliku proszę użyć zakładkę `Editor` już na platformie killercoda znajduje się ona nad terminalem. 
 
@@ -85,7 +87,7 @@ falcosidekick:
   config:
     webhook:
       method: POST
-      address: "http://3.91.220.165:5678/webhook-test/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      address: "http://3.91.220.165:5678/webhook/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       customheaders: "Content-Type: application/json"
       checkcert: false
 ```
@@ -98,6 +100,21 @@ Po zapisaniu pliky `values.yaml` przechodzimy do zakładki `Tab1` i wykonujemy k
 helm upgrade falco falcosecurity/falco -n falco -f values.yaml
 ```{{exec}}
 
+### Czekamy aż wszystkie pody będą miały STATUS Running:
+Zajmie to znowu około ~1m.
+```
+root@controlplane:~$ kubectl get pods -n falco
+NAME                                   READY   STATUS    RESTARTS   AGE
+falco-falcosidekick-6775f9d56f-67cth   1/1     Running   0          76s
+falco-falcosidekick-6775f9d56f-mm6pq   1/1     Running   0          76s
+falco-mbqs4                            2/2     Running   0          46s
+falco-sw96x                            2/2     Running   0          70s
+```
+
+możemy to sprawdzić przy użyciu komendy:
+```
+kubectl get pods -n falco
+```{{exec}}
 
 ### Przetestowanie reguł dla zespołu *soc-project-team*
 
@@ -120,4 +137,4 @@ a później:
 exit
 ```{{exec}}
 
-Powinno przyjść powiadomienie na odpowiedni kanał.
+Można przejść dalej, jeśli każde z powiadomień trafiło na inny kanał.
