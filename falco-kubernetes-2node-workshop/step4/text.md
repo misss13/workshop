@@ -10,7 +10,7 @@ Nasza reguła będzie się nazywać `Ssh keys added to authorized_keys`. Natomia
 
 ```
 After gaining access, attackers can modify the authorized_keys file to maintain persistence on a victim host. Where authorized_keys files are modified via cloud APIs or command line interfaces, an adversary may achieve privilege escalation on the target virtual machine if they add a key to a higher-privileged user. This rules aims at detecting any modification to the authorized_keys file, that is usually located under the .ssh directory in any users home directory.
-```
+```{{copy}}
 
 Warunki wywołania nowej reguły:
 - ktoś musi otworzyć plik do pisania - `open_write`{{copy}}
@@ -57,7 +57,7 @@ falcosidekick:
   config:
     webhook:
       method: POST
-      address: "http://3.91.220.165:5678/webhook-test/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" #zostawiacie url jak był
+      address: "http://3.91.220.165:5678/webhook/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" #zostawiacie url jak był
       customheaders: "Content-Type: application/json"
       checkcert: false
 ```
@@ -73,7 +73,7 @@ helm upgrade falco falcosecurity/falco -n falco -f values.yaml
 ```{{exec}}
 
 Czekamy aż nasze pody wystartują, możemy to sprawdzić komendą poniżej (oba pody falco muszą mieć status `Running` co zajmuje ~2min)
-**ORAZ PATRZYMY CZY W KOLUMNIE AGE PODY DZIAŁAJĄ KILKA SEKUND** będzie to oznaczać że mamy już do czynienia z nowymi podami, dopiero jeśli tak będzie można przejść dalej.
+**ORAZ PATRZYMY CZY W KOLUMNIE AGE DWA PODY FALCO DZIAŁAJĄ KILKA SEKUND** będzie to oznaczać że mamy już do czynienia z nowymi podami, dopiero jeśli tak będzie można przejść dalej.
 ```
 kubectl get pods -n falco
 ```{{exec}}
@@ -89,35 +89,28 @@ echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICR2396foaF4XENyQveTWb2jqCermPbQTK7yUD
 
 Na discordzie kanał `soc-project-team` powinien przyjść alert. Jeśli się tak stanie będzie można przejść do kolejnego zadania.
 
-<br>
-
 <details><summary>Wskazówka 1</summary>
 Proszę zwrócić uwagę na wcięcia w pliku values.yaml muszą być odpowiedniej szerokości.
-Jak coś nie działa można zawsze wykonać komendę `kubectl describe <nazwa-poda-z-error> -n falco`.
+Jak coś nie działa można zawsze wykonać komendę `kubectl describe falco-xxxxx -n falco`.
+Nazwę falco-xxxxx bierzemy z komendy `kubectl get pods -n falco`
 
 </details>
-
-<br>
 
 <details><summary>Wskazówka 2</summary>
-Jak jest Error a wskazówka wyżej nie pomogła to `kubectl describe <nazwa poda> -n falco` i sprawdzić co powoduje błąd. 
+Jak jest Error a wskazówka wyżej nie pomogła to `kubectl describe falco-xxxxx -n falco` i sprawdzić co powoduje błąd. 
 
 </details>
-
-<br>
-
-<br>
 
 <details><summary>Wskazówka 3</summary>
 Czater ładnie może napisać w czym jest problem jak się mu wklei logi z powyższych wskazówek.
 
 </details>
 
-<br>
-
 <details><summary>Wskazówka 4</summary>
 
 Jak naprawdę jest jakiś problem proszę przekopiować zawartość poniższą i zapisać plik `values.yaml` i przejść do kroku `Wczytanie nowej konfiguracji`.
+
+**Proszę pamiętać o adresie URL Webhooka, bo inaczej się nie wyśle powiadomienie na kanał**
 
 ```
 tty: true
@@ -147,21 +140,17 @@ falcosidekick:
   config:
     webhook:
       method: POST
-      address: "http://3.91.220.165:5678/webhook-test/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" #zostawiacie jak było
+      address: "http://3.91.220.165:5678/webhook/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" #zostawiacie jak było
       customheaders: "Content-Type: application/json"
       checkcert: false
 ```
 
 </details>
 
-<br>
-
 <details><summary>Wskazówka 5</summary>
 🐈🐈🐈🐈
 
 </details>
-
-<br>
 
 <details><summary>Rozwiązanie</summary>
 Proszę nie iść na skróty 😿
