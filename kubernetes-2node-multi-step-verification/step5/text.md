@@ -1,1 +1,1 @@
-# Operacje na n8n
+# Utworzenie playbooka
