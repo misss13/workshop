@@ -7,15 +7,17 @@ Jednym z zadań SOCu w organizacji jest monitorowanie takich niecodziennych dzia
 <br>
 
 <details><summary>Rozszerzony opis</summary>
-Takie operacje w organizacjach muszą być odnotowane w systemie ticketowania (śledzenia zadań które pracownicy robią, wraz z potwierdzeniami od ich przełożonych np.: Jira). Nikt normalnie nie powinien wypisywać zawartości pliku `/etc/shadow`, oczywiście z uwagi na naprawianie jakiegoś problemu może się to wydarzyć, wymaga to jednak wyjaśnienia oraz ustalenia odpowiedniego wyjątku jeśli odczyt robiony jest okresowo w ramach jakiegoś procesu.
+Takie operacje w organizacjach muszą być odnotowane w systemie ticketowania (śledzenia zadań, które pracownicy robią, wraz z potwierdzeniami od ich przełożonych np.: Jira). Nikt normalnie nie powinien wypisywać zawartości pliku `/etc/shadow`, oczywiście z uwagi na naprawianie jakiegoś problemu może się to wydarzyć, wymaga to jednak wyjaśnienia oraz ustalenia odpowiedniego wyjątku jeśli odczyt robiony jest okresowo w ramach jakiegoś procesu.
 
 #### Można zapytać dlaczego niby jest to podejrzane?
-A po co ktoś miałby czytać plik zawierający hashe haseł wszystkich użytkowników systemowych. Skrypty do wyciągania informacji z serwera, chętnie biorą te dane, do ransomwaru, późniejszej analizy lub odsprzedania. MITRE dla tej operacji definiuje techinikę [T1555](https://attack.mitre.org/techniques/T1555/).
+A po co ktoś miałby czytać plik zawierający hashe haseł wszystkich użytkowników systemowych. Skrypty do wyciągania informacji z serwera, chętnie biorą te dane, do ransomwaru, późniejszej analizy lub odsprzedania. MITRE dla tej operacji definiuje technikę [T1555](https://attack.mitre.org/techniques/T1555/).
 
 </details>
 
 ## Testowana reguła - odczyt z pliku `/etc/shadow`
 Przy uruchomieniu falco bez wskazania mu pliku z regułami zostanie użyty [domyślny zestaw reguł](https://github.com/falcosecurity/rules/blob/main/rules/falco_rules.yaml). Poniżej przedstawiono regułę, którą będziemy testować *Read sensitive file untrusted*.
+
+Poniższa reguła jest dość długa i może wydawać się skomplikowana, poniżej dokładniej przeanalizujemy jej części.
 
 
 ```
@@ -68,7 +70,7 @@ Makro **open_read** prosi żeby falco monitorowało system calle  wykorzystywane
   condition: (evt.type in (open,openat,openat2) and evt.is_open_read=true and fd.typechar='f' and fd.num>=0)
 ```
 
-Lista **sensitive_file_names** zawieraja absolutne ścieżki wrażliwych plików.
+Lista **sensitive_file_names** zawierają absolutne ścieżki wrażliwych plików.
 ```
 - list: sensitive_file_names
   items: [/etc/shadow, /etc/sudoers, /etc/pam.conf, /etc/security/pwquality.conf]
@@ -111,7 +113,7 @@ Dla uproszczenia:
 ```
 
 ### Inne wyjątki
-Warto pamiętać, że sam system robi odczyty tego pliku `/etc/shadow` jeśli potrzebuje przeprowadzić proces uwierzytelniania, np.: przy logowaniu. Przy tworzeniu/usuwaniu nowego użytkownika, zmianie hasła, użyciu samego `sudo`. Niezależnie od działania systemu, inne aplikacje również mogą polegać na systemowych użytkownikach i ich hasłach, na nie również trzeba wprowadzić wyjątki - ansible, vpn, mail, ssh. Wprowadzanie nowych narzędzi w trakcie trwania monitoringu, również może spowodować konieczność dodanie nowego wyjątku do tej reguły.
+Warto pamiętać, że sam system robi odczyty tego pliku `/etc/shadow` jeśli potrzebuje przeprowadzić proces uwierzytelniania, np.: przy logowaniu. Przy tworzeniu/usuwaniu nowego użytkownika, zmianie hasła, użyciu samego `sudo`. Niezależnie od działania systemu, inne aplikacje również mogą polegać na systemowych użytkownikach i ich hasłach, na nie również trzeba wprowadzić wyjątki - ansible, vpn, mail, ssh. Wprowadzanie nowych narzędzi w trakcie trwania monitoringu, również może spowodować konieczność dodania nowego wyjątku do tej reguły.
 
 Powyższa reguła może być znaleziona [tutaj](https://github.com/falcosecurity/rules/blob/b71a8c0df60b005dc3cd716ade0386d9c2324a1f/rules/falco_rules.yaml#L397).
 
@@ -120,7 +122,7 @@ Powyższa reguła może być znaleziona [tutaj](https://github.com/falcosecurity
 W tym celu spróbujemy dwóch podejść: na nowo utworzonym **podzie** oraz na aktualnym **nodzie**.
 
 ### Na podzie
-Tworzymy na początek nowy pod z aplikacją ngnix:
+Tworzymy na początek nowy pod z aplikacją nginx:
 
 ```
 kubectl create deployment nginx --image=nginx
@@ -143,7 +145,7 @@ kubectl exec -it $(kubectl get pods --selector=app=nginx -o name) -- cat /etc/sh
 ```{{exec}}
 
 #### Sprawdzenie 
-Poniższa komenda pozwoli na sprawdzenie czy faktycznie udało się nam złapać odczyt pliku `/etc/shadow`
+Poniższa komenda pozwoli na sprawdzenie, czy faktycznie udało się nam złapać odczyt pliku `/etc/shadow`
 ```
 kubectl logs -l app.kubernetes.io/name=falco -n falco -c falco | grep Warning | grep nginx
 ```{{exec}}
@@ -157,4 +159,4 @@ cat /etc/shadow
 kubectl logs -l app.kubernetes.io/name=falco -n falco -c falco | grep Warning | grep host
 ```{{exec}}
 
-Jeśli w obu przypadkach `grep` coś znalazł oznacza to, że monitoring działa poprawnie.
+Jeśli w obu przypadkach `grep` coś znalazł, oznacza to że monitoring działa poprawnie.
