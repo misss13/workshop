@@ -21,7 +21,7 @@ Tworzymy 2 nowe webhooki:
 Klikamy przycisk `Zapisz zmiany` - dół ekranu. Proszę nie zamykać tego menu w discordzie, do momentu skopiowania obu adresów URL webhooka.
 
 ## Logowanie do n8n
-Należy zarejestrować się do narzędzia n8n [https://app.n8n.cloud/register](https://app.n8n.cloud/register), po rejestracji platforma będzie działać 14 dni. Następnie należy przeklikać się do waszej nowo utworzonej instancji. Wybrać po lewej z zakładki opcję **Overview**.
+Należy zarejestrować się do narzędzia n8n [https://app.n8n.cloud/register](https://app.n8n.cloud/register), po rejestracji platforma będzie działać 14 dni. Następnie należy przeklikać się do waszej nowo utworzonej instancji i wybrać po lewej z zakładki opcję **Overview**.
 
 ### Tworzenie Discord webhook
 Wybieramy *Build a workflow*, w celu utworzenia nowej automatyzacji. Za pomocą znaku `+` w prawym górnym rogu dodajemy blok -> `Discord` -> `Send a message` i ustawiamy:
